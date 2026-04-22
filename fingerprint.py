@@ -2,10 +2,16 @@ from scipy.io import wavfile
 from scipy.signal import stft
 from scipy.ndimage import maximum_filter
 import numpy as np
+import math
 
 FAN_OUT = 10
 MAX_TIME_DELTA = 100
 MAX_PEAKS = 1000
+
+def get_freq_band(freq_bin, n_bands=12):
+    if freq_bin <= 10:
+        return 0
+    return min(int(math.log2(freq_bin / 10) * 3), n_bands - 1)
 
 def generate_hashes(filepath):
     # 1. load audio
@@ -24,7 +30,7 @@ def generate_hashes(filepath):
     # 5. spectrogram
     spec = np.abs(Zxx)
     log_spec = np.log1p(spec)
-    log_spec = log_spec / (np.max(log_spec) + 1e-6)  # normalize
+    log_spec = log_spec / (np.max(log_spec) + 1e-6)
 
     # 6. peak detection
     neighborhood_size = (30, 10)
@@ -45,17 +51,17 @@ def generate_hashes(filepath):
     hashes = []
     for i in range(len(peaks_by_time)):
         f1, t1, _ = peaks_by_time[i]
+        b1 = get_freq_band(f1)
         pairs_found = 0
         j = i + 1
         while j < len(peaks_by_time) and pairs_found < FAN_OUT:
             f2, t2, _ = peaks_by_time[j]
+            b2 = get_freq_band(f2)
             delta_t = t2 - t1
             if delta_t > MAX_TIME_DELTA:
                 break
-            f1q = (f1 // 4) * 4  # quantize to nearest even bin
-            f2q = (f2 // 4) * 4
-            delta_tq = (delta_t // 3) * 3  # quantize time delta
-            hashes.append(((f1q, f2q, delta_tq), t1))
+            delta_tq = (delta_t // 3) * 3
+            hashes.append(((b1, b2, delta_tq), t1))
             pairs_found += 1
             j += 1
 

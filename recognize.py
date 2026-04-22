@@ -12,8 +12,7 @@ SAMPLE_RATE = 44100
 DURATION = 20
 FILENAME = "query.wav"
 CLEAN_FILENAME = "query_clean.wav"
-MIN_SCORE = 5  # minimum number of matching hashes to consider a match
-MIN_SCORE = 1  # lower threshold for now while testing
+MIN_SCORE = 50
 
 def record_audio():
     print("Recording... play the song now!")
@@ -40,25 +39,41 @@ def record_audio():
     return CLEAN_FILENAME
 
 def match(query_hashes, db):
-    # for each hash in query, look up candidates in db
-    # group by (song_id, delta_t) to find time-aligned matches
     candidates = defaultdict(int)
 
     for hash_value, query_t1 in query_hashes:
         if hash_value in db:
             for song_id, db_t1 in db[hash_value]:
                 delta_t = db_t1 - query_t1
-                candidates[(song_id, delta_t)] += 1
+                delta_t_binned = (delta_t // 100) * 100
+                candidates[(song_id, delta_t_binned)] += 1
 
     if not candidates:
         return None, 0
 
-    # find best match
     best_match, best_score = max(candidates.items(), key=lambda x: x[1])
     song_id, delta_t = best_match
-
     return song_id, best_score
-
+# def match(query_hashes, db):
+#     # for each hash in query, look up candidates in db
+#     # group by (song_id, delta_t) to find time-aligned matches
+#     candidates = defaultdict(int)
+#
+#     for hash_value, query_t1 in query_hashes:
+#         if hash_value in db:
+#             for song_id, db_t1 in db[hash_value]:
+#                 delta_t = db_t1 - query_t1
+#                 candidates[(song_id, delta_t)] += 1
+#
+#     if not candidates:
+#         return None, 0
+#
+#     # find best match
+#     best_match, best_score = max(candidates.items(), key=lambda x: x[1])
+#     song_id, delta_t = best_match
+#
+#     return song_id, best_score
+#
 def recognize():
     db = load_database()
 
@@ -76,7 +91,7 @@ def recognize():
     print(f"Hashes found in database: {found_in_db}/{len(query_hashes)}")
 
     # DEBUG — check db has hashes for your song
-    song_name = "505-Arctic Monkeys(Youtube)"  # replace with exact filename in db
+    song_name = "505-Arctic Monkeys(youtube)"  # replace with exact filename in db
     song_hashes = [(k, v) for k, vals in db.items() for v in vals if v[0] == song_name]
     print(f"Total hashes in db for {song_name}: {len(song_hashes)}")
 
