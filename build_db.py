@@ -5,10 +5,8 @@ from database import create_database, add_to_database, save_database, load_datab
 SONGS_FOLDER = "songs/"
 
 def build_database():
-    # load existing db or create new one
     db = load_database()
 
-    # get all wav and mp3 files in songs folder
     songs = [f for f in os.listdir(SONGS_FOLDER) if f.endswith(".wav") or f.endswith(".mp3")]
 
     if not songs:
@@ -26,10 +24,10 @@ def build_database():
         try:
             hashes = generate_hashes(filepath)
             add_to_database(db, song_id, hashes)
-            print(f"  ✓ Added {len(hashes)} hashes")
+            print(f"   Added {len(hashes)} hashes")
 
         except Exception as e:
-            print(f"  ✗ Failed: {e}")
+            print(f"   Failed: {e}")
             continue
 
     # save to disk

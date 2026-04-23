@@ -9,7 +9,7 @@ def create_database():
 
 def add_to_database(db, song_id, hashes):
     for hash_value, t1 in hashes:
-        # make sure we're appending not overwriting
+
         if hash_value not in db:
             db[hash_value] = []
         db[hash_value].append((song_id, t1))

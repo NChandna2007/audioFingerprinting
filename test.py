@@ -1,7 +1,7 @@
 from fingerprint import generate_hashes, get_freq_band
 import numpy as np
 
-# get hashes from clean file
+
 clean_hashes = generate_hashes("songs/505 - Arctic Monkeys (youtube).wav")
 clean_hash_values = set(h[0] for h in clean_hashes)
 
@@ -16,7 +16,7 @@ print(f"Recording unique hashes: {len(query_hash_values)}")
 print(f"Overlapping hashes: {len(overlap)}")
 print(f"Overlap percentage: {len(overlap)/len(clean_hash_values)*100:.1f}%")
 
-# check band distribution
+
 clean_bands = [h[0][0] for h in clean_hashes]
 query_bands = [h[0][0] for h in query_hashes]
 print(f"\nClean file band distribution: {np.unique(clean_bands, return_counts=True)}")
