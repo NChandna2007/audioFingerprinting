@@ -71,12 +71,11 @@ def recognize():
             found_in_db += 1
     print(f"Hashes found in database: {found_in_db}/{len(query_hashes)}")
 
-    # DEBUG — check db has hashes for your song
-    song_name = "505-Arctic Monkeys(youtube)"  # replace with exact filename in db
+
+    song_name = "505-Arctic Monkeys(youtube)"
     song_hashes = [(k, v) for k, vals in db.items() for v in vals if v[0] == song_name]
     print(f"Total hashes in db for {song_name}: {len(song_hashes)}")
 
-    # match
     song_id, score = match(query_hashes, db)
     print(f"Best match: {song_id} with score: {score}")
 
