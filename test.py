@@ -5,7 +5,6 @@ import numpy as np
 clean_hashes = generate_hashes("songs/505 - Arctic Monkeys (youtube).wav")
 clean_hash_values = set(h[0] for h in clean_hashes)
 
-# get hashes from recording
 query_hashes = generate_hashes("query_clean.wav")
 query_hash_values = set(h[0] for h in query_hashes)
 
